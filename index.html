@@ -28,7 +28,7 @@
         background-color:  hsl(148, 38%, 91%);  
         min-height: 100vh;
       }
-      .form-change{
+      .form-change{ 
         width: 50%;
       }
       .was-validated .form-control:valid, 
@@ -66,7 +66,15 @@
         background-color: hsl(148, 38%, 91%);
       }
       .valid-border {
-        border-color:hsl(148, 38%, 91%) !important;
+        border-color:hsl(169, 82%, 27%) !important;
+      }
+
+      #liveAlertPlaceholder{ 
+        background-color:hsl(169, 37%, 27%); 
+        color: hsl(0, 0%, 100%);
+        font-size: 16px;
+        border-radius: 10px;
+        margin-bottom: 15px;
       }
  
       @media  (max-width: 770px) {
@@ -75,8 +83,12 @@
         }
         .form-change{  
             width: 75% !important; 
-            margin: 15px 0px 15px;
+            margin: 0px 0px 15px;
         }
+        #liveAlertPlaceholder{  
+          margin-bottom: 0px;
+        }
+ 
         .mobile-resp{
           padding: 10px !important;
         }
@@ -103,10 +115,11 @@
 </head>
 <body>
 
-
-  <header class="Contact-Page">
-    <div class="d-flex flex-column  p-5 gap-4 align-items-center justify-content-center mobile-resp">
-      <form action="#" class="px-3 m-2 row g-3 needs-validation bg-white rounded form-change" novalidate> 
+  
+  <header class="Contact-Page"> 
+    <div class="d-flex flex-column  p-5 align-items-center justify-content-center mobile-resp">
+      <div id="liveAlertPlaceholder"></div>
+      <form action="#" class="px-3 row g-3 needs-validation bg-white rounded form-change" novalidate> 
         <h3>Contact Us</h3>
         <div class="col-md-6">
           <label for="validationCustomFirstName" class="form-label">First Name *</label>
@@ -172,7 +185,7 @@
           </div>
         </div>
         <div class="d-grid col-12 mb-3">
-          <button class="btn btn-success" type="submit">Submit</button> 
+          <button class="btn btn-success" type="submit" id="liveAlertBtn">Submit</button> 
         </div>
       </form>
     </div> 
@@ -208,6 +221,9 @@
           }, false)
         })
 
+
+        //Ratio button background change when click
+
         const radioButtons = document.querySelectorAll('.form-check-input');
 
         radioButtons.forEach(radio => {
@@ -215,21 +231,88 @@
             document.querySelectorAll('.bg-change').forEach(div => {
               div.classList.remove('bg-selected');
             });
-            if (radio.checked) {
+            if (radio.checked && radio.closest('.bg-change')) {
               radio.closest('.bg-change').classList.add('bg-selected');
             }
           });
         });
 
-        const buttonClick = document.querySelectorAll('.btn');
-
-        buttonClick.addEventListener('onClick', function() { 
-          alert()
-        })
+        
+    })();
 
 
+    // Function to reset input values and text areas
+const resetForm = () => {
+  // Clear input fields
+  document.querySelectorAll('input').forEach(input => {
+    input.value = '';
+    input.classList.remove('valid-border'); // Remove any validation border if applied
+  });
 
-    })()
+  // Clear textareas
+  document.querySelectorAll('textarea').forEach(textarea => {
+    textarea.value = '';
+    textarea.classList.remove('valid-border'); // Remove any validation border if applied
+  });
+
+  document.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.checked = false;
+    if (radio.closest('.bg-change')) {
+      radio.closest('.bg-change').classList.remove('bg-selected'); // Remove any selected state
+    }
+  });
+
+  // Uncheck checkboxes (if any)
+  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+
+  // Remove 'was-validated' class from the form
+  const form = document.querySelector('.needs-validation');
+  if (form) {
+    form.classList.remove('was-validated');
+  }
+};
+
+// Function to append success message alert
+const appendAlert = (message1, message2) => {
+  const alertPlaceholder = document.getElementById('liveAlertPlaceholder');
+  if (alertPlaceholder) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `
+      <div class="alert alert-dismissible" role="alert">
+        <div>
+          <h5><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+            <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+          </svg>  ${message1}</h5> 
+        </div>
+        <div>${message2}</div>
+      </div>
+    `;
+    alertPlaceholder.innerHTML = '';  
+    alertPlaceholder.appendChild(wrapper);
+  }
+};
+ 
+const alertTrigger = document.getElementById('liveAlertBtn');
+if (alertTrigger) {
+  alertTrigger.addEventListener('click', (event) => {
+    const form = document.querySelector('.needs-validation');
+    if (form.checkValidity()) {
+      event.preventDefault();  
+    }
+    form.classList.add('was-validated');  
+
+     
+    if (form.checkValidity()) {
+      appendAlert('Message Sent!', "Thanks for completing the form. We'll be in touch soon!");
+      resetForm();  
+    }
+  });
+}
+
+ 
   </script>
 
 </body>
